@@ -177,12 +177,11 @@ xtriage(){
 phenix.xtriage $1.mtz input.xray_data.obs_labels="IMEAN,SIGIMEAN"
 }
 
-rename_cbfs() {
-    echo "Rename the prefix of a batch of cbfs."
+rename_cbf_files() {
     # Check if we have the required arguments
     if [ $# -ne 3 ]; then
         echo "Usage: rename_cbf_files old_number new_number run_number"
-        echo "Example: rename_cbfs 3282 3268 1"
+        echo "Example: rename_cbf_files 3282 3268 1"
         return 1
     fi
     
@@ -193,34 +192,46 @@ rename_cbfs() {
     # Pattern to match
     pattern="${old_num}_${run_num}_*.cbf"
     
-    # Count how many files will be affected
-    file_count=$(ls ${pattern} 2>/dev/null | wc -l)
+    # Debug: Print what we're looking for
+    echo "Looking for files matching: $pattern"
     
-    if [ "$file_count" -eq 0 ]; then
+    # First check if any files match before proceeding
+    if ! ls $pattern >/dev/null 2>&1; then
         echo "No files found matching pattern: ${pattern}"
+        echo "Current directory: $(pwd)"
+        echo "Files in directory:"
+        ls -la | grep ".cbf" | head -10
         return 1
     fi
     
+    # List matching files and count
+    echo "Matching files:"
+    ls $pattern | head -5
+    file_count=$(ls $pattern | wc -l)
     echo "Found $file_count files to rename."
-    echo "Will rename files from ${old_num}_${run_num}_*.cbf to ${new_num}_${run_num}_*.cbf"
-    read -p "Continue? (y/n): " confirm
     
-    if [ "$confirm" != "y" ]; then
-        echo "Operation cancelled."
-        return 1
-    fi
+    # Skip confirmation to avoid hanging
+    echo "Will rename files from ${old_num}_${run_num}_*.cbf to ${new_num}_${run_num}_*.cbf"
     
     # Do the renaming
-    for file in ${pattern}; do
+    for file in $pattern; do
+        # Ensure file exists and is a regular file
+        if [ ! -f "$file" ]; then
+            echo "Skipping non-existent file: $file"
+            continue
+        fi
+        
         # Extract the variable part (the digits after the second underscore)
         suffix=${file#${old_num}_${run_num}_}
         # Create the new filename
         newfile="${new_num}_${run_num}_${suffix}"
         # Rename the file
+        echo "Renaming: $file -> $newfile"
         mv "$file" "$newfile"
-        echo "Renamed: $file -> $newfile"
     done
     
-    echo "Renaming complete. $file_count files processed."
+    # Verify results
+    new_pattern="${new_num}_${run_num}_*.cbf"
+    new_count=$(ls $new_pattern 2>/dev/null | wc -l)
+    echo "Renaming complete. $new_count files with new pattern found."
 }
-
