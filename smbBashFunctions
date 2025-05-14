@@ -1,0 +1,226 @@
+#function CCcc {
+#~/scripts/CCcc.py
+#}
+
+
+function dmincbf {
+echo "This script takes the file stem name of a cbf image file, sweep number, start dmin, increment, stop dmin"
+if [ $# -lt 5]; then
+   echo 1>&2 "$0: not enough arguments"
+   echo "Usage: dmincbf stemFileiName sweepNumber startDmin incrDmin stopDmin"
+   echo "Example: multiDmin.sh 2608central 1 0.650 0.001 0.659"
+   exit 2
+elif [ $# -gt 5 ]; then   echo 1>&2 "$0: too many arguments"
+   echo "Usage: dmincbf stemFileiName sweepNumber startDmin incrDmin stopDmin"
+   echo "Example: dmincbf 2608central 1 0.650 0.001 0.659"
+fi
+   echo "Example: mdmincbf 2608central 1 0.650 0.001 0.659"
+  
+for i in `seq $3 $4 $5`;
+do
+ autoxds $1_$2_00001.cbf -full -highres $i;
+ mv $1_$2_xds $1_$2_xdsDmin$i;
+done
+echo "All done!" 
+}
+
+
+function dmincbf2 {
+echo "This script takes the file stem name of a cbf image file, sweep number, start image, last image, start dmin, increment, stop dmin"
+if [ $# -lt 7]; then
+   echo 1>&2 "$0: not enough arguments"
+   echo "Usage: dmincbf stemFileiName sweepNumber startDmin incrDmin stopDmin"
+   echo "Example: multiDmin.sh 2608central 1 0.650 0.659 0.001"
+   exit 2
+elif [ $# -gt 7 ]; then   echo 1>&2 "$0: too many arguments"
+   echo "Usage: dmincbf stemFileiName sweepNumber startDmin incrDmin stopDmin"
+   echo "Example: dmincbf 2608central 1 00100 00800 :q0.650 0.659 0.001"
+fi
+   echo "Example: mdmincbf 2608central 1 0.650 0.659 0.001"
+  
+for i in `seq $5 $6 $7`;
+do
+ autoxds $1_$2_$3.cbf -last $4 -friedel false -full -highres $i;
+ mv $1_$2_xds $1_$2_xdsDmin$i;
+done
+echo "All done!" 
+}
+
+
+function dminimg {
+echo "This script takes the file stem name of a img image file, sweep number, start dmin, increment, stop dmin"
+if [ $# -lt 5]; then
+   echo 1>&2 "$0: not enough arguments"
+   echo "Usage: dminimg stemFileiName sweepNumber startDmin incrDmin stopDmin"
+   echo "Example: dminimg 2608central 1 0.650 0.659 0.001"
+   exit 2
+elif [ $# -gt 5 ]; then   echo 1>&2 "$0: too many arguments"
+   echo "Usage: dminimg stemFileiName sweepNumber startDmin incrDmin stopDmin"
+   echo "Example: dminimg 2608central 1 0.650 0.659 0.001"
+fi
+   echo "Example: dminimg 2608central 1 0.650 0.659 0.001"
+  
+for i in `seq $3 $4 $5`;
+do
+ autoxds $1_$2_00001.img -full -highres $i;
+ mv $1_$2_xds $1_$2_xdsDmin$i;
+done
+echo "All done!" 
+}
+
+
+function dminimg2 {
+echo "This script takes the file stem name of a cbf image file, sweep number, start image, last image, start dmin, increment, stop dmin"
+if [ $# -lt 7]; then
+   echo 1>&2 "$0: not enough arguments"
+   echo "Usage: dminimg2 stemFileiName sweepNumber startDmin incrDmin stopDmin"
+   echo "Example: multiDmin.sh 2608central 1 0.650 0.659 0.001"
+   exit 2
+elif [ $# -gt 7 ]; then   echo 1>&2 "$0: too many arguments"
+   echo "Usage: dminimg2 stemFileiName sweepNumber startDmin incrDmin stopDmin"
+   echo "Example: dminimg2 2608central 1 00100 00800 :q0.650 0.659 0.001"
+fi
+   echo "Example: dminimg2 2608central 1 0.650 0.659 0.001"
+  
+for i in `seq $5 $6 $7`;
+do
+ autoxds $1_$2_$3.img -last $4 -friedel false -full -highres $i;
+ mv $1_$2_xds $1_$2_xdsDmin$i;
+done
+echo "All done!" 
+}
+
+function summary {
+echo "This script extracts the summary table from the aimless.log file."
+echo "It assumes that the output files are stored by run number following the converntion used by autoxds."
+echo "This script takes the file stem name of a image file and the run number as two arguments in that order."
+echo "This script returns the summary table from a aimless.log file."
+echo "This is faster than navigating to the folder and searching the log file for the summary table with vim."
+if [ $# -lt 2 ]; then
+   echo 1>&2 "$0: not enough arguments"
+   echo "Usage: summary 3091 1"
+   return 2
+elif [ $# -gt 2 ]; then
+   echo 1>&2 "$0: too many arguments"
+   echo "Usage: summary 3091 1"
+   return 2
+fi
+rm -f tmp
+# touch $1aimlessRun$2Summary.txt
+awk '/SUMMARY_BEGIN/,/SUMMARY_END/' $1_$2_xds/$1_$2_aimless.log > tmp && mv tmp $1aimlessRun$2Summary.txt
+echo "Use spacebar to move forward a page and `b` to go back a page. Use `q` to quit the more viewer."
+more $1aimlessRun$2Summary.
+}
+
+
+function summaryd {
+echo "This script extracts the summary table from the aimless.log file."
+echo "It assumes that the output files are stored by run number following the converntion used by autoxds plus DminX.XX."
+echo "This script takes the file stem name of a image file, the run number, and the dmin  as three arguments in that order."
+echo "This script returns the summary table from a aimless.log file."
+echo "This is faster than navigating to the folder and searching the log file for the summary table with vim."
+if [ $# -lt 3 ]; then
+   echo 1>&2 "$0: not enough arguments"
+   echo "Usage: summary 3091 1"
+   return 2
+elif [ $# -gt 3 ]; then
+   echo 1>&2 "$0: too many arguments"
+   echo "Usage: summary 3091 1"
+   return 2
+fi
+rm -f tmp
+# touch $1aimlessRun$2Summary.txt
+awk '/SUMMARY_BEGIN/,/SUMMARY_END/' $1_$2_xdsDmin$3/$1_$2_aimless.log > tmp && mv tmp $1aimlessRun$2Dmin$3Summary.txt
+echo "Use spacebar to move forward a page and `b` to go back a page. Use `q` to quit the more viewer."
+more $1aimlessRun$2Dmin$3Summary.txt
+}
+
+
+function wilson {
+echo "This script calls wilsonplot.py to generate a Wilson Plot using the data in the truncate.log file."
+echo "It assumes that the output files are stored by run number following the converntion used by autoxds."
+echo "It has to be evoked from the directory with the images."
+echo "This script takes the file stem of a image filename and the run number as two arguments in that order."
+echo "This is faster than navigating to the folder and searching the log file for the summary table with vim."
+if [ $# -lt 2 ]; then
+   echo 1>&2 "$0: not enough arguments"
+   echo "Usage: wilson 3091 1"
+   return 2
+elif [ $# -gt 2 ]; then
+   echo 1>&2 "$0: too many arguments"
+   echo "Usage: wilson 3091 1"
+   return 2
+fi
+cctbx.python ~/scripts/wilsonplot2.py ./$1_$2_xds/$1_$2_truncate.log $1_$2-wilsonplot.png && open $1_$2-wilsonplot.png
+}
+
+
+function wilsond {
+echo "This script calls wilsonplot.py to generate a Wilson Plot using the data in the truncate.log file."
+echo "It assumes that the output files are stored by run number following the converntion used by autoxds."
+echo "It has to be evoked from the directory with the images."
+echo "This script takes the file stem of a image filename, the run number, and the dmin as three arguments in that order."
+echo "This is faster than navigating to the folder and searching the log file for the wilson plot in truncate.log with vim."
+if [ $# -lt 3 ]; then
+   echo 1>&2 "$0: not enough arguments"
+   echo "Usage: wilson 3091 1 1.05"
+   return 2
+elif [ $# -gt 3 ]; then
+   echo 1>&2 "$0: too many arguments"
+   echo "Usage: wilson 3091 1 1.05"
+   return 2
+fi
+cctbx.python ~/scripts/wilsonplot2.py ./$1_$2_xdsDmin$3/$1_$2_truncate.log $1_$2Dmin$3-wilsonplot.png && open $1_$2Dmin$3-wilsonplot.png
+}
+
+xtriage(){
+phenix.xtriage $1.mtz input.xray_data.obs_labels="IMEAN,SIGIMEAN"
+}
+
+rename_cbfs() {
+    echo "Rename the prefix of a batch of cbfs."
+    # Check if we have the required arguments
+    if [ $# -ne 3 ]; then
+        echo "Usage: rename_cbf_files old_number new_number run_number"
+        echo "Example: rename_cbfs 3282 3268 1"
+        return 1
+    fi
+    
+    old_num="$1"
+    new_num="$2"
+    run_num="$3"
+    
+    # Pattern to match
+    pattern="${old_num}_${run_num}_*.cbf"
+    
+    # Count how many files will be affected
+    file_count=$(ls ${pattern} 2>/dev/null | wc -l)
+    
+    if [ "$file_count" -eq 0 ]; then
+        echo "No files found matching pattern: ${pattern}"
+        return 1
+    fi
+    
+    echo "Found $file_count files to rename."
+    echo "Will rename files from ${old_num}_${run_num}_*.cbf to ${new_num}_${run_num}_*.cbf"
+    read -p "Continue? (y/n): " confirm
+    
+    if [ "$confirm" != "y" ]; then
+        echo "Operation cancelled."
+        return 1
+    fi
+    
+    # Do the renaming
+    for file in ${pattern}; do
+        # Extract the variable part (the digits after the second underscore)
+        suffix=${file#${old_num}_${run_num}_}
+        # Create the new filename
+        newfile="${new_num}_${run_num}_${suffix}"
+        # Rename the file
+        mv "$file" "$newfile"
+        echo "Renamed: $file -> $newfile"
+    done
+    
+    echo "Renaming complete. $file_count files processed."
+}
+
