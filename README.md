@@ -24,7 +24,7 @@ These functions execute various data reduction and file wrangling tasks on hundr
 3. rename_cbf_files: rename 100s of X-ray diffraction files.
 4. summary: run summary scirpt on autoxds processing folder ending with dmin.
 5. wilsond: make wilson plot for autoxds processing folder ending with dmin.
-6. CCcc
+6. CCcc: shelxd CC vs cc plot.
 
 ## Update history
 
