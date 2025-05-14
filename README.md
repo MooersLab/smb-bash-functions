@@ -13,8 +13,9 @@ These functions execute various data reduction and file wrangling tasks on hundr
 1. Move smbBashFunctions to `~/.bashFunctions`.
 2. Change to the bash shell by entering `bash` in the terminal.
 3. `source bashFunctions`
-4. Enter `which rename_cbfs` into the code of a function.
-5. Enter the function name and any command.
+4. Enter the function name with arguments to print the documentation in the terminal.
+5. Enter `which rename_cbfs` to display the code of a function in the terminal. 
+6. Enter the function name and any command-line arguments.
 
 
 
